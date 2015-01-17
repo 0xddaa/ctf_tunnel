@@ -1,10 +1,12 @@
+#!/usr/bin/python
+
 import subprocess as sp
 
 def make_tunnel():
-    s_ports = [10001, 10002, 10003]
-    for i in range(0, 20):
-        for j in range(0, 20):
-           for k in range(0, 3):
+    s_ports = [443, 21025, 3650]
+    for i in range(0, 16):
+        for j in range(0, 16):
+           for k in range(1, len(s_ports)):
                f_ip = sp.Popen("ip route get 10.217.%s.201| awk 'NR==1 {print $NF}'" % (i+1), shell=True, stdout=sp.PIPE).stdout.read().strip("\n")
                t_ip = "10.217.%d.201" % (j+1)
                dport = s_ports[k]
@@ -22,5 +24,3 @@ def make_tunnel():
                t = sp.Popen(tunnel, shell=True)
 
 make_tunnel()
-
-

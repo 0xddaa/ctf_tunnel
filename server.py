@@ -21,7 +21,7 @@ def readline(s):
         sys.exit(1)
 
 def threadWork(csock):
-    s_ports = [10001, 10002]
+    s_ports = [443, 21025, 3650]
     gameboxs = []
     for i in range(20):
         gameboxs.append("10.217.%d.201" % (i+1))
@@ -48,9 +48,8 @@ def threadWork(csock):
     f_ip = sp.Popen("ip route get 10.217.%s.201| awk 'NR==1 {print $NF}'" % (tinfo_json["fake_team"]), shell=True, stdout=sp.PIPE).stdout.read().strip("\n")
     t_ip = gameboxs[int(tinfo_json["target_team"])-1]
     dport = s_ports[int(tinfo_json["service_id"])-1]
-#    tunnel = "ncat -vc \"nc -s %s %s %s\" -kl %s > /dev/null 2>&1" % (f_ip, t_ip, dport, tport)
-    tunnel = "ncat -vc \"nc -s %s %s %s\" -kl %s" % (f_ip, t_ip, dport, tport)
-    print "tunnel: "+ tunnel
+    tunnel = "ncat -vc \"nc -s %s %s %s\" -kl %s > /dev/null 2>&1" % (f_ip, t_ip, dport, tport)
+    msg = "tunnel: "+ tunnel + "\n"
     tport_json = [{"tunnel_port":tport}]
     csock.send(json.dumps(tport_json) + "\n")
 
@@ -64,7 +63,8 @@ def threadWork(csock):
         check = "curl -d \"ip=%s&port=%s&state=0&comment='From %s'\" 10.218.0.100/admin/update_service_state" % (t_ip, dport, f_ip)
 
     p = sp.Popen(check, shell=True, stdout=sp.PIPE, stderr=sp.PIPE)
-    print p.stdout.read()
+    msg += p.stdout.read()
+    print msg
     csock.send("update service status to [%s]\n" % (status_json["status"]))
     csock.close()
     sys.exit(1)
