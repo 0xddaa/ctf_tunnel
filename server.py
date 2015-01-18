@@ -95,6 +95,7 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
             for i in whitelist:
                 if src == i:
                     executor.submit(threadWork, csock)
+            csock.close()
 
 
 sock.close()
